@@ -1,6 +1,6 @@
 MODULE := engines/immortal
 
-MODULE_OBJS :=  \
+MODULE_OBJS = \
 	animation.o \
 	console.o   \
 	dialog.o \
@@ -13,9 +13,6 @@ MODULE_OBJS :=  \
 	rooms.o \
 	sound.o \
 	timer.o
-
-MODULE_DIRS += \
-	engines/immortal
 
 # This module can be built as a plugin
 ifeq ($(ENABLE_IMMORTAL), DYNAMIC_PLUGIN)

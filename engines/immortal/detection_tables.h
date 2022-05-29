@@ -19,24 +19,25 @@
  *
  */
 
-#include "gui/debugger.h"
-#include "immortal/console.h"
-#include "immortal/immortal.h"
-
 namespace Immortal {
 
-Console::Console(ImmortalEngine *vm)
-    : GUI::Debugger()
-    , _vm(vm) {
-	registerCmd("test",   WRAP_METHOD(Console, Cmd_test));
-}
+const PlainGameDescriptor immortalGames[] = {
+	{ "immortal", "The Immortal" },
+	{ 0, 0 }
+};
 
-//Console::~Console() {
-//}
+const ADGameDescription gameDescriptions[] = {
+	{
+		"immortal",
+		nullptr,
+		AD_ENTRY1s("IMMORTAL.EXE", "ebf4660b5d8eb3370609e0b2c60d93cd", 53434),
+		Common::EN_ANY,
+		Common::kPlatformDOS,
+		ADGF_UNSTABLE,
+		GUIO1(GUIO_NONE)
+	},
 
-bool Console::Cmd_test(int argc, const char **argv) {
-	debugPrintf("Test\n");
-	return true;
-}
+	AD_TABLE_END_MARKER
+};
 
 } // namespace Immortal

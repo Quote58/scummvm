@@ -19,24 +19,25 @@
  *
  */
 
-#include "gui/debugger.h"
-#include "immortal/console.h"
-#include "immortal/immortal.h"
+#ifndef IMMORTAL_METAENGINE_H
+#define IMMORTAL_METAENGINE_H
 
-namespace Immortal {
+#include "base/plugins.h"
+#include "common/achievements.h"
+#include "engines/advancedDetector.h"
 
-Console::Console(ImmortalEngine *vm)
-    : GUI::Debugger()
-    , _vm(vm) {
-	registerCmd("test",   WRAP_METHOD(Console, Cmd_test));
-}
+class ImmortalMetaEngine : public AdvancedMetaEngine {
+public:
+	const char *getName() const override;
 
-//Console::~Console() {
-//}
+	Common::Error createInstance(OSystem *syst, Engine **engine, const ADGameDescription *desc) const override;
 
-bool Console::Cmd_test(int argc, const char **argv) {
-	debugPrintf("Test\n");
-	return true;
-}
+	/**
+	 * Determine whether the engine supports the specified MetaEngine feature.
+	 *
+	 * Used by e.g. the launcher to determine whether to enable the Load button.
+	 */
+	bool hasFeature(MetaEngineFeature f) const override;
+};
 
-} // namespace Immortal
+#endif

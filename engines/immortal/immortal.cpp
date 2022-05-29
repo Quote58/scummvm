@@ -4,10 +4,10 @@
  * are too numerous to list here. Please refer to the COPYRIGHT
  * file distributed with this source distribution.
  *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -15,45 +15,55 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  */
 
-#include "audio/mixer.h"
-#include "common/debug.h"
-#include "common/debug-channels.h"
-#include "common/error.h"
-#include "common/events.h"
-#include "common/system.h"
-#include "engines/util.h"
-#include "graphics/palette.h"
-#include "graphics/surface.h"
-
-#include "immortal/console.h"
-#include "immortal/graphics.h"
 #include "immortal/immortal.h"
+#include "immortal/detection.h"
+#include "immortal/console.h"
 #include "immortal/logic.h"
 #include "immortal/resman.h"
 #include "immortal/sound.h"
+#include "immortal/graphics.h"
 
+#include "common/scummsys.h"
+#include "common/config-manager.h"
+#include "common/debug-channels.h"
+#include "common/events.h"
+#include "common/system.h"
+#include "common/debug.h"
+#include "common/debug-channels.h"
+#include "common/error.h"
+
+#include "engines/util.h"
+#include "audio/mixer.h"
+
+#include "graphics/palette.h"
+#include "graphics/surface.h"
 
 namespace Immortal {
 
+ImmortalEngine *g_engine;
+
 ImmortalEngine::ImmortalEngine(OSystem *syst, const ADGameDescription *gameDesc)
-    : Engine(syst)
-    , _gameDescription(gameDesc)
-    , _resMan(nullptr)
-    , _midiPlayer(nullptr)
+	: Engine(syst)
+	, _gameDescription(gameDesc)
+	, _resMan(nullptr)
+	, _midiPlayer(nullptr)
     , _screen(nullptr)
     , _console(nullptr)
-    , _logic(nullptr) {
-	DebugMan.addDebugChannel(kDebugGeneral, "general", "Immortal general debug channel");
+    , _logic(nullptr)
+	, _randomSource("Immortal") {
+	g_engine = this;
+	debug("ImmortalEngine::ImmortalEngine");
+	//DebugMan.addDebugChannel(kDebugGeneral, "general", "Immortal general debug channel");
 }
 
 ImmortalEngine::~ImmortalEngine() {
-	DebugMan.clearAllDebugChannels();
-
+//	DebugMan.clearAllDebugChannels();
+	debug("ImmortalEngine::~ImmortalEngine");
+	
 	delete _logic;
 	delete _screen;
 	delete _midiPlayer;
@@ -61,6 +71,13 @@ ImmortalEngine::~ImmortalEngine() {
 	delete _resMan;
 }
 
+uint32 ImmortalEngine::getFeatures() const {
+	return _gameDescription->flags;
+}
+
+Common::String ImmortalEngine::getGameId() const {
+	return _gameDescription->gameId;
+}
 
 Common::Error ImmortalEngine::run() {
 	initGraphics(320, 200);
@@ -83,11 +100,19 @@ Common::Error ImmortalEngine::run() {
 			g_system->delayMillis(loopEnd);
 	}
 
+	return Common::kNoError; 
+
+}
+
+Common::Error ImmortalEngine::syncGame(Common::Serializer &s) {
+	// The Serializer has methods isLoading() and isSaving()
+	// if you need to specific steps; for example setting
+	// an array size after reading it's length, whereas
+	// for saving it would write the existing array's length
+	int dummy = 0;
+	s.syncAsUint32LE(dummy);
+
 	return Common::kNoError;
 }
 
-bool ImmortalEngine::hasFeature(EngineFeature f) const {
-    return false;
-}
-
-}
+} // namespace Immortal

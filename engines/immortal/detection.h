@@ -19,24 +19,49 @@
  *
  */
 
-#include "gui/debugger.h"
-#include "immortal/console.h"
-#include "immortal/immortal.h"
+#ifndef IMMORTAL_DETECTION_H
+#define IMMORTAL_DETECTION_H
+
+#include "engines/advancedDetector.h"
 
 namespace Immortal {
 
-Console::Console(ImmortalEngine *vm)
-    : GUI::Debugger()
-    , _vm(vm) {
-	registerCmd("test",   WRAP_METHOD(Console, Cmd_test));
-}
+enum ImmortalDebugChannels {
+	kDebugGraphics = 1 << 0,
+	kDebugPath     = 1 << 1,
+	kDebugScan     = 1 << 2,
+	kDebugFilePath = 1 << 3,
+	kDebugScript   = 1 << 4
+};
 
-//Console::~Console() {
-//}
+extern const PlainGameDescriptor immortalGames[];
 
-bool Console::Cmd_test(int argc, const char **argv) {
-	debugPrintf("Test\n");
-	return true;
-}
+extern const ADGameDescription gameDescriptions[];
 
 } // namespace Immortal
+
+class ImmortalMetaEngineDetection : public AdvancedMetaEngineDetection {
+	static const DebugChannelDef debugFlagList[];
+
+public:
+	ImmortalMetaEngineDetection();
+	~ImmortalMetaEngineDetection() override {}
+
+	const char *getEngineId() const override {
+		return "immortal";
+	}
+
+	const char *getName() const override {
+		return "The Immortal";
+	}
+
+	const char *getOriginalCopyright() const override {
+		return "(c)1990 Will Harvey & Electronic Arts";
+	}
+
+	const DebugChannelDef *getDebugChannels() const override {
+		return debugFlagList;
+	}
+};
+
+#endif
